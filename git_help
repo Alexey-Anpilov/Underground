@@ -1,7 +1,0 @@
-git add name_of_file/dir - to add file to git control or to index changes
-git status - to figure out status of files in dir
-git clone - to clone repository
-git init - to initialise git in dir
-git diff - to see the difference between modified and indexed version of file
-git commit - to save modified changes into new commit
-
