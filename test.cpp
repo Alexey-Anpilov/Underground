@@ -1,7 +1,6 @@
 #include<iostream>
 #include"station.h"
 #include<cassert>
-#include"line.h"
 
 void TestStation(){
     // создание станции
@@ -15,9 +14,9 @@ void TestStation(){
     // изменение пассажиропотока
     {
         Station st(1, 12, "Novodachnaya");
-        st.ChangePassStream(20);
-        assert(st.GetStream() == 20);
+        assert(st.ChangePassStream(20) == true && st.GetStream() == 20);
 
+        assert(st.ChangePassStream(-10) == false);
     }
 
     // сравнение станций операторами < и ==
@@ -33,24 +32,6 @@ void TestStation(){
     }
 }
 
-void TestLine(){
-    Station st1(1,10,"Bor");
-    Station st2(2, 20, "Cher");
-    Travel t(st1, st2, 3);
-    std::vector<Travel> l1 = {t};
-    Station st3(3, 15, "D");
-    Station st4(4, 40, "R");
-    Line line(l1);
-    line.AddStation(st3, 5);
-    line.AddStation(st4, 6);
-    std::cout << line.FindMinTime("Bor", "R") << std::endl; 
-    std::cout << line.FindMinTime("R", "Bor") << std::endl; 
-    std::cout << line.FindMinTime("Cher", "D") << std::endl; 
-    std::cout << line.FindMinTime("D", "Cher") << std::endl; 
-    std::cout << line.FindMinTime("Cher", "R") << std::endl; 
-    std::cout << line.FindMinTime("R", "Cher") << std::endl;
-}
 int main() {
     TestStation();
-    TestLine();
 }

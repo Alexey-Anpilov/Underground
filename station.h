@@ -6,20 +6,20 @@
 
 class Station{
 private:
-    uint st_num;    // номер станции
-    uint stream;         // средний пассажиропоток(чел/час)
+    int station_num;    // номер станции
+    int stream;         // пассажиропоток
     std::string name;   // имя станции 
 
 public:
     
-    Station(uint st_num, uint stream, std::string name) // создать станцию с заданными параметрами
-        :st_num(st_num),
+    Station(int st_num, int stream, std::string name) // создать станцию с заданными параметрами
+        :station_num(st_num),
          stream(stream),
          name(name) {}  
 
 
     
-    void ChangePassStream(uint new_stream);   // изменение пассажиропотока
+    bool ChangePassStream(int new_stream);   // изменение пассажиропотока
 
     // перегрузка операторов < и == для сравнения по номеру станции
 
@@ -30,11 +30,11 @@ public:
  
     // получение значений полей
 
-    uint GetNum() const{        
-        return st_num;
+    int GetNum() const{        
+        return station_num;
     }
     
-    uint GetStream() const{    
+    int GetStream() const{    
         return stream;
     }
 
