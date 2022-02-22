@@ -24,9 +24,9 @@ public:
     // перегрузка операторов < и == для сравнения по номеру станции
 
     
-    bool operator<(const Station& st); 
+    bool operator<(Station st); 
     
-    bool operator==(const Station& st);
+    bool operator==(Station st);
  
     // получение значений полей
 

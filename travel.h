@@ -6,9 +6,8 @@
 
 class Travel{
 private:
-    uint time;
     std::pair<Station&, Station&> travel;
-
+    uint time;
 public:
     Travel(Station& st1, Station& st2, uint time)   
         :travel(st1, st2),
@@ -26,5 +25,7 @@ public:
         return travel.second;
     }
 };
+
+
 
 #endif

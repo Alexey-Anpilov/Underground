@@ -5,11 +5,11 @@ void Station::ChangePassStream(uint new_stream){
      
 }
 
-bool Station::operator< (const Station& st){
+bool Station::operator< (Station st){
         return st_num < st.GetNum();
 }
 
-bool Station::operator==(const Station& st){
+bool Station::operator==(Station st){
         return st_num == st.GetNum();
 
 }

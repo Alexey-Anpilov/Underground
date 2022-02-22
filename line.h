@@ -4,22 +4,24 @@
 #include<vector>
 #include"travel.h"
 
+struct Node{
+    Station st;
+    Node* left = nullptr;
+    Node* right = nullptr;
+    uint8_t l = 0;
+    uint8_t r = 0;
+
+    Node(Station st)
+        :st(st) {}
+};
+
 class Line{
 private:
-    std::vector<Travel> line; // линия представляет собой вектор из перегонов(travel)
+    Node* root = nullptr;
 public:
-    Line(const std::vector<Travel> line)
-        :line(line){}
+    void AddStation(Station& st);
 
-    void AddStation(Station& new_station, uint time);
-
-    std::vector<Travel>::const_iterator FindStation(const std::string& name) const;
-    
-    std::pair<Station&, uint> FindRightNeighbor(const std::string& name) const;
-
-    std::pair<Station&, uint> FindLeftNeighbor(const std::string& name) const;
-
-    uint FindMinTime(std::string st1, std::string name) const;
+    void PrintLine() const ;
 };
 
 #endif

@@ -1,61 +1,86 @@
 #include"line.h"
+#include<iostream>
 
-void Line::AddStation(Station& new_station, uint time){
-    Travel new_travel = Travel(line.back().GetSecondStation(), new_station, time);
-    line.push_back(new_travel);
-}
-
-std::vector<Travel>::const_iterator Line::FindStation(const std::string& name) const{
-    for(auto it = begin(line); it != end(line); ++it){
-        if((*it).GetFirstStation().GetName() == name || (*it).GetSecondStation().GetName() == name){
-            return it;
+void Line::AddStation(Station& new_st){
+    Node* new_node = new Node(new_st);
+    Node* ptr = root;
+    Node* pprev_node;
+    Node* prev_node;
+    while(ptr != nullptr){
+        prev_node = ptr;
+        if (new_st < ptr->st){
+            ptr = ptr->left;
+        } else{
+            ptr= ptr->right;
+        }
+    }
+    if (prev_node == nullptr){
+       root = new_node; 
+    } else{
+        if (new_st < prev_node->st){
+            Node* t = prev_node->left;
+            prev_node->l = 0;
+            prev_node->left = new_node;
+            new_node->left = t;
+            new_node->l = 1;
+            new_node->r = 1;
+            new_node->right = prev_node;
+        }
+        else{
+            Node* t = prev_node->right;
+            prev_node->r = 0;
+            prev_node->right = new_node;
+            new_node->right = t;
+            new_node->l = 1;
+            new_node->r = 1;
+            new_node->left = prev_node; 
         }
     }
 }
 
-std::pair<Station&, uint> Line::FindRightNeighbor(const std::string& name) const{
-    for(const Travel& tr : line){
-        if(tr.GetFirstStation().GetName() == name){
-            return {tr.GetSecondStation(), tr.GetTime()};
+void Line::PrintLine() const{
+    Node* p = root;
+    while(p != nullptr){
+        std::cout << p->st.GetNum() << " " << p->st.GetName() << std::endl;
+        p = p->right;
+    }
+}
+
+
+
+
+/*Node* new_node = new Node(new_st);
+    Node* ptr = root;
+    Node* pprev_node;
+    Node* prev_node;
+    int r = 0, l = 0;
+    pprev_node = ptr;
+    prev_node = ptr;
+    while(ptr != nullptr){
+        if (new_st < ptr->st){
+            if (r == 1){
+                pprev_node = prev_node;
+                r = 0;
+            }
+            l = 1;
+            prev_node = ptr;
+            ptr = ptr->left;
+        } else{
+            if(l == 1){
+                pprev_node = prev_node;
+                l = 0;
+            }
+            r = 1;
+            prev_node = ptr;
+            ptr = ptr->right;
         }
-    }    
-}
-
-std::pair<Station&, uint> Line::FindLeftNeighbor(const std::string& name) const{
-    for(const Travel& tr : line){
-        if(tr.GetSecondStation().GetName() == name){
-            return {tr.GetFirstStation(), tr.GetTime()};
-        } 
     }
-}    
-
-
-uint Line::FindMinTime(std::string st1, std::string st2) const{
-    if (st1 == st2){
-        return 0;
-    }
-    auto it1 = this->FindStation(st1);
-    auto it2 = this->FindStation(st2);
-    uint result = 0;
-    if (it1 > it2){
-        auto t = it2;
-        it2 = it1;
-        it1 = t;
-        auto t2 = st2;
-        st2 = st1;
-        st1 = t2;
-    }
-    
-    if ((*it1).GetFirstStation().GetName() == st1){
-        result += (*it1).GetTime();
-    }
-
-    if ((*it2).GetSecondStation().GetName() == st2){
-        result += (*it2).GetTime();
-    }
-    it1++;
-    for(auto it = it1; it1 != it2; it1++){
-        result += (*it).GetTime();
-    }
-    return result;
-}
+    if (prev_node == nullptr){
+       root = new_node; 
+    } else{
+        if (r == 1){
+            prev_node->right = new_node;
+            prev_node->r = 0;
+            
+        }
+    }*/
