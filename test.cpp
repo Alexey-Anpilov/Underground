@@ -1,6 +1,8 @@
 #include<iostream>
 #include"station.h"
 #include<cassert>
+#include"line.h"
+
 
 void TestStation(){
     // создание станции
@@ -14,9 +16,8 @@ void TestStation(){
     // изменение пассажиропотока
     {
         Station st(1, 12, "Novodachnaya");
-        assert(st.ChangePassStream(20) == true && st.GetStream() == 20);
-
-        assert(st.ChangePassStream(-10) == false);
+        st.ChangePassStream(20);
+        assert(st.GetStream() == 20);
     }
 
     // сравнение станций операторами < и ==
@@ -32,6 +33,20 @@ void TestStation(){
     }
 }
 
+void TestLine(){
+    Line line1;
+    Station st1(1, 12, "Borovitskaya");
+    line1.AddStation(&st1, 5);
+    Station st2(2, 15, "Polyanka");
+    line1.AddStation(&st2, 2);
+    Station st3(3, 10, "Chehovskaya");
+    line1.AddStation(&st3, 3);
+    line1.PrintLine();
+    std::cout << line1.FindRightNeighbor(2).first.GetName() << std::endl << line1.FindRightNeighbor(2).second << std::endl;
+}
+
+
 int main() {
     TestStation();
+    TestLine();
 }

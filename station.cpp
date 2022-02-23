@@ -1,12 +1,7 @@
 #include "station.h"
 
-bool Station::ChangePassStream(int new_stream){
-    if(new_stream >= 0){
+void Station::ChangePassStream(int new_stream){
         stream = new_stream;
-        return true;
-    } else {
-        return false;
-    }
 }
 
 bool Station::operator< (const Station& st){

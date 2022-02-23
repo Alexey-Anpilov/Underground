@@ -6,8 +6,8 @@
 
 class Station{
 private:
-    int station_num;    // номер станции
-    int stream;         // пассажиропоток
+    uint station_num;    // номер станции
+    uint stream;         // пассажиропоток
     std::string name;   // имя станции 
 
 public:
@@ -19,7 +19,7 @@ public:
 
 
     
-    bool ChangePassStream(int new_stream);   // изменение пассажиропотока
+    void ChangePassStream(int new_stream);   // изменение пассажиропотока
 
     // перегрузка операторов < и == для сравнения по номеру станции
 
@@ -30,11 +30,11 @@ public:
  
     // получение значений полей
 
-    int GetNum() const{        
+    uint GetNum() const{        
         return station_num;
     }
     
-    int GetStream() const{    
+    uint GetStream() const{    
         return stream;
     }
 
