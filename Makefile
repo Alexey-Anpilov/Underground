@@ -3,19 +3,16 @@ FLAGS = -Wall -Wextra
 all: test
 
 
-test: station.o test.o line.o
+test: test.o line.o station.o
 	g++ station.o test.o line.o -o test
 
-
-station.o: station.cpp station.h 
+station.o: station.cpp station.h
 	g++ -c $(FLAGS) station.cpp
-
-
-test.o: test.cpp station.h
+test.o: test.cpp
 	g++ -c $(FLAGS) test.cpp
 
-line.o: line.h travel.h
+line.o: line.cpp line.h travel.h station.h
 	g++ -c $(FLAGS) line.cpp
 
 clean:
-	rm -rf *.o test
+	rm -rf *.o test line

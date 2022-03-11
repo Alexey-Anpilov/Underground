@@ -20,14 +20,7 @@ public:
 
     
     void ChangePassStream(int new_stream);   // изменение пассажиропотока
-
-    // перегрузка операторов < и == для сравнения по номеру станции
-
     
-    bool operator<(const Station& st); 
-    
-    bool operator==(const Station& st);
- 
     // получение значений полей
 
     uint GetNum() const{        
@@ -43,5 +36,11 @@ public:
     }
 
 };
+
+// перегрузка операторов < и == для сравнения по номеру станции
+
+bool operator<(const Station& lhs, const Station& rhs);
+
+bool operator==(const Station& lhs, const Station& rhs);
 
 #endif

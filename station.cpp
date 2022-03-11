@@ -1,14 +1,13 @@
-#include "station.h"
+#include"station.h"
 
-void Station::ChangePassStream(int new_stream){
+bool operator<(const Station& lhs, const Station& rhs){
+    return lhs.GetNum() < rhs.GetNum();
+}
+
+bool operator==(const Station& lhs, const Station& rhs){
+        return lhs.GetNum() == rhs.GetNum();
+
+} 
+void Station::ChangePassStream(int new_stream){   // изменение пассажиропотока
         stream = new_stream;
-}
-
-bool Station::operator< (const Station& st){
-        return station_num < st.GetNum();
-}
-
-bool Station::operator==(const Station& st){
-        return station_num == st.GetNum();
-
-}
+    }

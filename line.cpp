@@ -13,62 +13,23 @@ uint Line::LevelRand() const{
 
 
 
-void Line::ChangeTravel(Node* first_node, Node* second_node, Node* new_node, Station* new_st){
-    
-    first_node->forward.SetSecond(new_st);
-    first_node->forward.SetTime(new_node->back.GetTime());
-    new_node->back.SetFirst(&(first_node->st));
+void Line::ChangeTravel(Node* first_node, Node* second_node, Node* new_node){
+    first_node->forward.second_st = &new_node->st;
+    first_node->forward.time = new_node->back.GetTime();
+    new_node->back.first_st = &first_node->st;
     if (second_node != nullptr){
-        new_node->forward.SetSecond(&(second_node->st));
-        second_node->back.SetSecond(&new_node->st);
-        second_node->back.SetTime(new_node->forward.GetTime());
+        second_node->back.second_st = &new_node->st;
+        second_node->back.time = new_node->forward.GetTime();
+        new_node->forward.second_st = &second_node->st;
     }
 }
 
-
-
-void Line::AddStation(Station* new_st, uint time_back, uint time_for){
-    Node* current = header;
-    std::vector<Node*> changes(max_level);
-    
-    if (current == nullptr){
-        Node* new_node = new Node(max_level, *new_st, time_back, time_for);
-        header = new_node;
-        return;
-    }
-
-    for(int i = max_level - 1; i >= 0; --i){
-        while(current->following[i] != nullptr){
-            if (*new_st < current->following[i]->st){
-                break;
-            }
-            current = current->following[i];
-        }
-        changes[i] = current;
-    }
-    
-    current = current->following[0];
-    uint new_level = LevelRand();
-
-    Node* new_node = new Node(new_level, *new_st, time_back, time_for);
-    std::cout << new_node->st.GetName();
-
-    ChangeTravel(changes[0], current, new_node, new_st);
-
-
-    for(uint i = 0; i <= new_level; i++){
-        new_node->following[i] = changes[i]->following[i];
-        changes[i]->following[i] = new_node;
-    }
-    
-}
-
-Line::Node* Line::FindNode(uint num){
+Line::Node* Line::FindNode(uint num) const{
     Node* current = header;
 
     for(int i = max_level - 1; i >= 0; --i){
         while(current->following[i] != nullptr){
-            if (num < current->following[i]->st.GetNum()){
+            if (num < current->following[i]->st.GetNum() || current->following[i] == header){
                 break;
             }
             current = current->following[i];
@@ -78,16 +39,99 @@ Line::Node* Line::FindNode(uint num){
     return current;
 }
 
-std::pair<Station, uint> Line::FindLeftNeighbor(uint num){
+
+void Line::AddStation(const Station* new_st, uint time_back, uint time_for){
+    Node* current = header;
+    std::vector<Node*> changes(max_level);    
+    if (current == nullptr){
+        Node* new_node = new Node(max_level, *new_st);
+        header = new_node;
+        return;
+    }
+
+    for(int i = max_level - 1; i >= 0; --i){
+        while(current->following[i] != nullptr){
+            if (*new_st < current->following[i]->st || current->following[i] == header){
+                break;
+            }
+            current = current->following[i];
+        }
+        changes[i] = current;
+    }
+    
+    current = current->following[0]; //если вставляется между двумя узлами, то этот будет правый
+    uint new_level = LevelRand();
+
+    Node* new_node = new Node(new_level, *new_st, time_back, time_for);
+
+    ChangeTravel(changes[0], current, new_node);
+
+
+    for(uint i = 0; i <= new_level; i++){
+        new_node->following[i] = changes[i]->following[i];
+        changes[i]->following[i] = new_node;
+    }
+    
+}
+
+void Line::MakeCircle(uint time){
+    Node* current = header;
+    for(int i = max_level - 1; i >= 0; --i){
+        while(current->following[i] != nullptr){
+            current = current->following[i];
+        }
+    }
+    header->back.time = time;      
+    current->forward.time = time;
+    for(auto& it : current->following){
+        it = header;
+    }
+    return;
+}
+
+
+std::pair<Station, uint> Line::FindLeftNeighbor(uint num) const{
     Node* node = FindNode(num);
     return {node->back.GetFirstStation(), node->back.GetTime()};
 }
 
 
-std::pair<Station, uint> Line::FindRightNeighbor(uint num){
+std::pair<Station, uint> Line::FindRightNeighbor(uint num) const{
     Node* node = FindNode(num);
     return {node->forward.GetSecondStation(), node->forward.GetTime()};
 }
+
+uint Line::MinTime(uint st_num1, uint st_num2) const{
+    if (st_num2 < st_num1){
+        uint t = st_num2;
+        st_num2 = st_num1;
+        st_num1 = t;
+    }
+
+    Node* node1 = FindNode(st_num1);
+    Node* current = node1;
+    Node* node2 = FindNode(st_num2);
+
+    uint time = 0;
+    while (current != node2){
+        time += current->forward.GetTime();
+        current = current->following[0];
+    }
+    
+    if (header->back.GetTime() != 0){
+        
+        uint time_rev = 0;
+        while(node2 != node1){
+            time_rev += node2->forward.GetTime();
+            node2 = node2->following[0];
+        }
+        return std::min(time, time_rev);
+
+    }
+
+    return time; 
+}
+
 
 void Line::PrintLine() const{
     Node* it = header;
@@ -97,3 +141,18 @@ void Line::PrintLine() const{
         it = it->following[0];
     }
 }
+
+Line::~Line(){
+    Node* current = header;
+    Node* previous;
+    while(current->following[0] != nullptr){
+        if(current->following[0] == header){
+            break;
+        }
+        previous = current;
+        current = current->following[0];
+        delete previous;
+    }
+    delete current;
+}
+

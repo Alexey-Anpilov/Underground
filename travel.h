@@ -2,26 +2,20 @@
 #define TRAVEL_H_
 
 #include"station.h"
+#include<memory.h>
+
 
 class Travel{
 private:
-    uint time;
-    Station* first_st = nullptr;
-    Station* second_st = nullptr;
+    uint time;                      //время прогона(мин)
+    Station* first_st = nullptr;    //указатель на первую станцию
+    Station* second_st = nullptr;   //указатель на вторую станцию
+    friend class Line;
 public:
     Travel(uint time):time(time) {}
-    void SetFirst(Station* st){
-        first_st = st;
-    }
     
-    void SetSecond(Station* st){
-        second_st = st;
-    }
+    //получение значений полей класса
 
-    void SetTime(uint t){
-        time = t;
-    }
-    
     Station GetFirstStation(){
         return *first_st;
     }
