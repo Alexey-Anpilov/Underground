@@ -40,7 +40,9 @@ private:
     void ChangeTravel(Node* first_node, Node* second_node, Node* new_node);    //изменение указателей в перегонах при добавлении новой станции между двумя другими
 
 public:
-    void AddStation(const Station* new_st, uint time_back = 0, uint time_for = 0);  //добавление станции
+    Line(const Station* first_st);
+
+    void AddStation(const Station* new_st, uint time_back, uint time_for = 0);  //добавление станции
 
     void MakeCircle(uint time);                             //можно сделать линию кольцевой
 
@@ -51,6 +53,8 @@ public:
     uint MinTime(uint st_num1, uint st_num2) const;               //оценка минимального времени для перемещения между двумя станциями
 
     void PrintLine() const;     //вывод всех станций линии
+
+    Station GetSt(uint st_num) const;       //для тестирования
 
     ~Line();
 };

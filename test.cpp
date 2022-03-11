@@ -33,20 +33,48 @@ void TestStation(){
 }
 
 void TestLine(){
-    Line line1;
+/*
+        --Borovitskaya
+       |      | 2       
+     1 |  Polyanka      
+       |      | 4       
+        --Chehovskaya 
+*/
+
     Station st1(1, 12, "Borovitskaya");
-    line1.AddStation(&st1);
+    Line line(&st1);
+    assert(line.GetSt(1) == st1);  //добавление первой станции конструктором
+
     Station st2(2, 15, "Polyanka");
-    line1.AddStation(&st2, 2);
+    line.AddStation(&st2, 2);    
+    assert(line.GetSt(2) == st2);  //добавление станции к начальной
+   
     Station st3(3, 10, "Chehovskaya");
-    line1.AddStation(&st3, 5);
-    line1.MakeCircle(1);
-    Station st4(4, 15, "Nagornaya");
-    line1.AddStation(&st4, 3, 1);
-    std::cout << line1.MinTime(3,1) << std::endl  
-              << line1.MinTime(1,2) << std::endl
-              << line1.MinTime(3,2) << std::endl
-              << line1.MinTime(1,3) << std::endl;
+    line.AddStation(&st3, 4);
+    assert(line.FindLeftNeighbor(3).first == st2 && line.FindLeftNeighbor(3).second == 4);    //добавление станции в корректное место и работа Line::FindLeftNeighbor
+    assert(line.FindRightNeighbor(2).first == st3 && line.FindRightNeighbor(2).second == 4);  //работа Line::FindRightNeighbor
+
+    assert(line.MinTime(1, 3) == 6);                       
+    assert(line.MinTime(1, 3) == line.MinTime(3, 1));
+
+    line.MakeCircle(1);
+    assert(line.FindLeftNeighbor(1).first == st3 && line.FindRightNeighbor(3).first == st1);    //проверка создания круговой линии
+    assert(line.MinTime(2, 3) == 3);    //корректность работы минимального времени на кольцевой линии
+    assert(line.MinTime(1, 2) == 2);
+
+/*
+        -----Borovitskaya
+     3 |          | 2       
+   Prazhskaya  Polyanka      
+     1 |          | 4       
+        -----Chehovskaya
+*/
+    
+    Station st4(4, 20, "Prazhskaya");
+    line.AddStation(&st4, 1, 3);
+    assert(line.FindLeftNeighbor(1).first == st4);
+    assert(line.MinTime(1, 4) == 3);
+    assert(line.MinTime(2, 4) == 5);
 }
 
 

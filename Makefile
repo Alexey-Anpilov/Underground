@@ -8,6 +8,7 @@ test: test.o line.o station.o
 
 station.o: station.cpp station.h
 	g++ -c $(FLAGS) station.cpp
+	
 test.o: test.cpp
 	g++ -c $(FLAGS) test.cpp
 

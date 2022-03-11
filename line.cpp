@@ -1,8 +1,12 @@
 #include"line.h"
 
+Line::Line(const Station* first_st){
+    header = new Node(max_level, *first_st);
+}
 
-uint Line::LevelRand() const{
-    uint level = 1;
+
+uint Line::LevelRand() const{                   //вычисление количества уровней связей для добавляемого элемента. Вероятность получить еще один уровень каждый раз равна p
+    uint level = 1;                             
     float r = (float)rand()/RAND_MAX;
     while(level < max_level && r < p){
         ++level;
@@ -13,18 +17,18 @@ uint Line::LevelRand() const{
 
 
 
-void Line::ChangeTravel(Node* first_node, Node* second_node, Node* new_node){
+void Line::ChangeTravel(Node* first_node, Node* second_node, Node* new_node){       //при добавлении новой станции между двумя другими необходимо перепривязать перегоны
     first_node->forward.second_st = &new_node->st;
     first_node->forward.time = new_node->back.GetTime();
     new_node->back.first_st = &first_node->st;
     if (second_node != nullptr){
-        second_node->back.second_st = &new_node->st;
+        second_node->back.first_st = &new_node->st;
         second_node->back.time = new_node->forward.GetTime();
         new_node->forward.second_st = &second_node->st;
     }
 }
 
-Line::Node* Line::FindNode(uint num) const{
+Line::Node* Line::FindNode(uint num) const{                //поиск узла в skip-list по номеру станции
     Node* current = header;
 
     for(int i = max_level - 1; i >= 0; --i){
@@ -39,16 +43,15 @@ Line::Node* Line::FindNode(uint num) const{
     return current;
 }
 
+/*
+* Метод Line::AddStation позволяет добавить новую станцию в skip-list.
+* time_back - время прогона от старой станции до новой
+* time_for - время прогона от новой станции до следующей после нее(используется при добавлении станции между двумя другими)  
+*/
 
-void Line::AddStation(const Station* new_st, uint time_back, uint time_for){
+void Line::AddStation(const Station* new_st, uint time_back, uint time_for){ 
     Node* current = header;
-    std::vector<Node*> changes(max_level);    
-    if (current == nullptr){
-        Node* new_node = new Node(max_level, *new_st);
-        header = new_node;
-        return;
-    }
-
+    std::vector<Node*> changes(max_level);    //массив со связями для нового узла
     for(int i = max_level - 1; i >= 0; --i){
         while(current->following[i] != nullptr){
             if (*new_st < current->following[i]->st || current->following[i] == header){
@@ -74,15 +77,20 @@ void Line::AddStation(const Station* new_st, uint time_back, uint time_for){
     
 }
 
-void Line::MakeCircle(uint time){
+
+
+void Line::MakeCircle(uint time){       //используется, чтобы сделать линию кольцевой
     Node* current = header;
     for(int i = max_level - 1; i >= 0; --i){
         while(current->following[i] != nullptr){
             current = current->following[i];
         }
     }
+    
     header->back.time = time;      
+    header->back.first_st = &current->st;
     current->forward.time = time;
+    current->forward.second_st = &header->st;
     for(auto& it : current->following){
         it = header;
     }
@@ -90,36 +98,38 @@ void Line::MakeCircle(uint time){
 }
 
 
-std::pair<Station, uint> Line::FindLeftNeighbor(uint num) const{
+std::pair<Station, uint> Line::FindLeftNeighbor(uint num) const{        //возвращает левую соседнюю станцию и время прогона до нее
     Node* node = FindNode(num);
     return {node->back.GetFirstStation(), node->back.GetTime()};
 }
 
 
-std::pair<Station, uint> Line::FindRightNeighbor(uint num) const{
+std::pair<Station, uint> Line::FindRightNeighbor(uint num) const{       //возвращает правую соседнюю станцию и время прогона до нее
     Node* node = FindNode(num);
     return {node->forward.GetSecondStation(), node->forward.GetTime()};
 }
 
-uint Line::MinTime(uint st_num1, uint st_num2) const{
-    if (st_num2 < st_num1){
+uint Line::MinTime(uint st_num1, uint st_num2) const{       //ищет минимальное время пути между двумя станциия
+    
+    if (st_num2 < st_num1){                         //упорядочивание станций(чтобы st_num2 >= st_num1)
         uint t = st_num2;
         st_num2 = st_num1;
         st_num1 = t;
     }
 
-    Node* node1 = FindNode(st_num1);
-    Node* current = node1;
+    Node* node1 = FindNode(st_num1);                //поиск первой и второй станций в skip-list
     Node* node2 = FindNode(st_num2);
 
+
+    Node* current = node1;                          //подсчет времени
     uint time = 0;
-    while (current != node2){
+    while (current != node2){               
         time += current->forward.GetTime();
         current = current->following[0];
     }
     
-    if (header->back.GetTime() != 0){
-        
+
+    if (header->back.GetTime() != 0){               //если кольцевая то нужно сравнивать время для двух разных путей
         uint time_rev = 0;
         while(node2 != node1){
             time_rev += node2->forward.GetTime();
@@ -133,7 +143,7 @@ uint Line::MinTime(uint st_num1, uint st_num2) const{
 }
 
 
-void Line::PrintLine() const{
+void Line::PrintLine() const{                      //Печать информации о станциях на линии
     Node* it = header;
     while(it != nullptr){
         std::cout << "Number: "<< it->st.GetNum() << std::endl << "Name: "
@@ -141,6 +151,11 @@ void Line::PrintLine() const{
         it = it->following[0];
     }
 }
+
+Station Line::GetSt(uint st_num) const{
+    return FindNode(st_num)->st;
+}   
+
 
 Line::~Line(){
     Node* current = header;
