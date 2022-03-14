@@ -15,7 +15,17 @@ uint Line::LevelRand() const{                   //вычисление коли�
     return level;
 }
 
+/*void Line::SetFirstStation(const Station* new_st){
+    Node* new_node = new Node(max_level, *new_st);
+    for(int i = max_level - 1; i >= 0;++i){
+        new_node->following[i] = header->following[i];
+    }
 
+    Node* current = header;
+    while(current.following[0] != nullptr && current->following[0] != header)
+    ChangeTravel(header.)
+
+}*/
 
 void Line::ChangeTravel(Node* first_node, Node* second_node, Node* new_node){       //при добавлении новой станции между двумя другими необходимо перепривязать перегоны
     first_node->forward.second_st = &new_node->st;
@@ -28,7 +38,7 @@ void Line::ChangeTravel(Node* first_node, Node* second_node, Node* new_node){   
     }
 }
 
-Line::Node* Line::FindNode(uint num) const{                //поиск узла в skip-list по номеру станции
+Node* Line::FindNode(uint num) const{                //поиск узла в skip-list по номеру станции
     Node* current = header;
 
     for(int i = max_level - 1; i >= 0; --i){
@@ -51,10 +61,20 @@ Line::Node* Line::FindNode(uint num) const{                //поиск узла
 
 void Line::AddStation(const Station* new_st, uint time_back, uint time_for){ 
     Node* current = header;
+    /*if (current->st == *new_st){               //обработка случая, когда добавляется станция в начало
+        SetFirstStation(new_st);
+        return;
+    }*/
+    
     std::vector<Node*> changes(max_level);    //массив со связями для нового узла
+    bool not_end = false;
     for(int i = max_level - 1; i >= 0; --i){
         while(current->following[i] != nullptr){
             if (*new_st < current->following[i]->st || current->following[i] == header){
+                break;
+            }
+            if (*new_st == current->following[i]->st){
+                not_end = true;
                 break;
             }
             current = current->following[i];
@@ -70,11 +90,14 @@ void Line::AddStation(const Station* new_st, uint time_back, uint time_for){
     ChangeTravel(changes[0], current, new_node);
 
 
-    for(uint i = 0; i <= new_level; i++){
+    for(uint i = 0; i < new_level; i++){
         new_node->following[i] = changes[i]->following[i];
         changes[i]->following[i] = new_node;
     }
     
+    if(not_end){
+        RenumStations(new_node->st.GetNum());
+    }
 }
 
 
@@ -149,13 +172,29 @@ void Line::PrintLine() const{                      //Печать информа
         std::cout << "Number: "<< it->st.GetNum() << std::endl << "Name: "
                   << it->st.GetName() << std:: endl << "Stream: " << it->st.GetStream() << std::endl;
         it = it->following[0];
+        if (it == header){
+            break;
+        }
     }
 }
 
-Station Line::GetSt(uint st_num) const{
+const Station& Line::GetSt(uint st_num) const{
     return FindNode(st_num)->st;
 }   
 
+void Line::RenumStations(uint st_num){          //перенумеровка станций при добавлении в середину/начало ветки
+    Node* current = header;
+    while (current->st.GetNum() != st_num){     //находим откуда надо менять
+        current = current->following[0];
+    }
+    current = current->following[0];
+    while(current->following[0] != nullptr && current->following[0] != header){         //меняем в цикле номера для всех последующих станций
+        st_num++;
+        current->st.SetStNum(st_num);
+        current = current->following[0];
+    }
+    current->st.SetStNum(st_num + 1);
+}
 
 Line::~Line(){
     Node* current = header;

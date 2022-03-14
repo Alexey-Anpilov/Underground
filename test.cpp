@@ -2,6 +2,7 @@
 #include<cassert>
 #include"station.h"
 #include"line.h"
+#include"change_station.h"
 
 void TestStation(){
     // создание станции
@@ -75,6 +76,12 @@ void TestLine(){
     assert(line.FindLeftNeighbor(1).first == st4);
     assert(line.MinTime(1, 4) == 3);
     assert(line.MinTime(2, 4) == 5);
+
+
+    Station st5(2, 10, "Tulskaya");         //добавление станции в произвольное место
+    line.AddStation(&st5, 1, 2);
+    st2.SetStNum(3);
+    assert(line.FindRightNeighbor(2).first == st2 && line.FindLeftNeighbor(2).first == st1);
 }
 
 

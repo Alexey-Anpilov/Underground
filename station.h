@@ -12,7 +12,7 @@ private:
 
 public:
     
-    Station(int st_num, int stream, std::string name) // создать станцию с заданными параметрами
+    Station(int st_num, int stream, const std::string& name) // создать станцию с заданными параметрами
         :station_num(st_num),
          stream(stream),
          name(name) {}  
@@ -31,8 +31,12 @@ public:
         return stream;
     }
 
-    std::string GetName() const{
+    const std::string& GetName() const{
         return name;
+    }
+
+    void SetStNum(uint new_stnum){      //изменение номера станции
+        station_num = new_stnum;
     }
 
 };

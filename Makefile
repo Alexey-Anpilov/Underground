@@ -12,7 +12,7 @@ station.o: station.cpp station.h
 test.o: test.cpp
 	g++ -c $(FLAGS) test.cpp
 
-line.o: line.cpp line.h travel.h station.h
+line.o: line.cpp line.h travel.h station.h node.h
 	g++ -c $(FLAGS) line.cpp
 
 clean:

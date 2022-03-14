@@ -2,7 +2,6 @@
 #define TRAVEL_H_
 
 #include"station.h"
-#include<memory.h>
 
 
 class Travel{
@@ -12,18 +11,19 @@ private:
     Station* second_st = nullptr;   //указатель на вторую станцию
     
     
+    friend class Node;
     friend class Line;
 public:
     Travel(uint time):time(time) {}
     
     //получение значений полей класса
 
-    Station GetFirstStation(){
+    const Station& GetFirstStation(){
         return *first_st;
     }
 
 
-    Station GetSecondStation(){
+    const Station& GetSecondStation(){
         return *second_st;
     }
 

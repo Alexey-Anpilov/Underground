@@ -1,34 +1,14 @@
 #ifndef LINE_H_
 #define LINE_H_
-
-#include<vector>
-#include"station.h"
-#include "travel.h"
 #include<iostream>
 #include<array>
+#include"node.h"
+
 
 class Line {
 private:
     const uint max_level = 3;     //максимум 3 уровня связей
     const float p = 0.5;          //вероятность при наличии i-того уровня получить (i+1) уровень  
-    
-    //элементы в skip-list
-    class Node{
-    public:
-        std::vector<Node*> following;  //указатели на следующие элементы по уровням начиная с 1 до 3
-        Station st;                    //станция
-        Travel forward;                //перегон(мин) до следующей станции
-        Travel back;                   //перегон(мин) до предыдущей станции
-        
-        Node(uint lvl,const Station& new_st, uint time_back = 0, uint time_for = 0)
-            :following(lvl, nullptr),
-             st(new_st),
-             forward(time_for),
-             back(time_back) {
-                 forward.first_st = &st;
-                 back.second_st = &st;
-             }
-    };
     
     Node* header = nullptr;     //указатель на начальный элемент
     
@@ -39,6 +19,9 @@ private:
 
     void ChangeTravel(Node* first_node, Node* second_node, Node* new_node);    //изменение указателей в перегонах при добавлении новой станции между двумя другими
 
+    void RenumStations(uint st_num);       //перенумеровка станций при добавлении в конец или середину
+
+    //void SetFirstStation(const Station*);    //функция обрабатывает случай, когда заменяется первая станция
 public:
     Line(const Station* first_st);
 
@@ -54,7 +37,7 @@ public:
 
     void PrintLine() const;     //вывод всех станций линии
 
-    Station GetSt(uint st_num) const;       //для тестирования
+    const Station& GetSt(uint st_num) const;       //для тестирования
 
     ~Line();
 };
