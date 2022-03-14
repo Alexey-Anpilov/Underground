@@ -4,6 +4,7 @@
 #include"station.h"
 
 
+
 class Travel{
 private:
     uint time;                      //время прогона(мин)

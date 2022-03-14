@@ -28,13 +28,13 @@ uint Line::LevelRand() const{                   //вычисление коли�
 }*/
 
 void Line::ChangeTravel(Node* first_node, Node* second_node, Node* new_node){       //при добавлении новой станции между двумя другими необходимо перепривязать перегоны
-    first_node->forward.second_st = &new_node->st;
+    first_node->forward.second_st = new_node->st;
     first_node->forward.time = new_node->back.GetTime();
-    new_node->back.first_st = &first_node->st;
+    new_node->back.first_st = first_node->st;
     if (second_node != nullptr){
-        second_node->back.first_st = &new_node->st;
+        second_node->back.first_st = new_node->st;
         second_node->back.time = new_node->forward.GetTime();
-        new_node->forward.second_st = &second_node->st;
+        new_node->forward.second_st = second_node->st;
     }
 }
 
@@ -43,7 +43,7 @@ Node* Line::FindNode(uint num) const{                //поиск узла в sk
 
     for(int i = max_level - 1; i >= 0; --i){
         while(current->following[i] != nullptr){
-            if (num < current->following[i]->st.GetNum() || current->following[i] == header){
+            if (num < current->following[i]->st->GetNum() || current->following[i] == header){
                 break;
             }
             current = current->following[i];
@@ -70,10 +70,10 @@ void Line::AddStation(const Station* new_st, uint time_back, uint time_for){
     bool not_end = false;
     for(int i = max_level - 1; i >= 0; --i){
         while(current->following[i] != nullptr){
-            if (*new_st < current->following[i]->st || current->following[i] == header){
+            if (*new_st < *current->following[i]->st || current->following[i] == header){
                 break;
             }
-            if (*new_st == current->following[i]->st){
+            if (*new_st == *current->following[i]->st){
                 not_end = true;
                 break;
             }
@@ -96,7 +96,7 @@ void Line::AddStation(const Station* new_st, uint time_back, uint time_for){
     }
     
     if(not_end){
-        RenumStations(new_node->st.GetNum());
+        RenumStations(new_node->st->GetNum());
     }
 }
 
@@ -111,9 +111,9 @@ void Line::MakeCircle(uint time){       //используется, чтобы �
     }
     
     header->back.time = time;      
-    header->back.first_st = &current->st;
+    header->back.first_st = current->st;
     current->forward.time = time;
-    current->forward.second_st = &header->st;
+    current->forward.second_st = header->st;
     for(auto& it : current->following){
         it = header;
     }
@@ -169,31 +169,30 @@ uint Line::MinTime(uint st_num1, uint st_num2) const{       //ищет мини�
 void Line::PrintLine() const{                      //Печать информации о станциях на линии
     Node* it = header;
     while(it != nullptr){
-        std::cout << "Number: "<< it->st.GetNum() << std::endl << "Name: "
-                  << it->st.GetName() << std:: endl << "Stream: " << it->st.GetStream() << std::endl;
+        std::cout << "Number: "<< it->st->GetNum() << std::endl << "Name: "
+                  << it->st->GetName() << std:: endl << "Stream: " << it->st->GetStream() << std::endl;
         it = it->following[0];
         if (it == header){
             break;
         }
-    }
-}
+    }}
 
 const Station& Line::GetSt(uint st_num) const{
-    return FindNode(st_num)->st;
+    return *FindNode(st_num)->st;
 }   
 
 void Line::RenumStations(uint st_num){          //перенумеровка станций при добавлении в середину/начало ветки
     Node* current = header;
-    while (current->st.GetNum() != st_num){     //находим откуда надо менять
+    while (current->st->GetNum() != st_num){     //находим откуда надо менять
         current = current->following[0];
     }
     current = current->following[0];
     while(current->following[0] != nullptr && current->following[0] != header){         //меняем в цикле номера для всех последующих станций
         st_num++;
-        current->st.SetStNum(st_num);
+        current->st->SetStNum(st_num);
         current = current->following[0];
     }
-    current->st.SetStNum(st_num + 1);
+    current->st->SetStNum(st_num + 1);
 }
 
 Line::~Line(){

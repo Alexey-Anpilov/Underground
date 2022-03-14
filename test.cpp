@@ -82,6 +82,7 @@ void TestLine(){
     line.AddStation(&st5, 1, 2);
     st2.SetStNum(3);
     assert(line.FindRightNeighbor(2).first == st2 && line.FindLeftNeighbor(2).first == st1);
+
 }
 
 

@@ -1,8 +1,9 @@
 #ifndef STATION_H_
 #define STATION_H_
 
-#include <string>
-
+#include<string>
+#include"change.h"
+#include<vector>
 
 class Station{
 private:
@@ -39,6 +40,11 @@ public:
         station_num = new_stnum;
     }
 
+    virtual std::vector<Change> GetChanges() const{     //будет проверяться, что возвращаемый вектор пустой => по указателю лежит Station 
+        return {};
+    }
+
+    virtual ~Station() {}   //виртуальный декструктор для корректной очистки для классов-наследников
 };
 
 // перегрузка операторов < и == для сравнения по номеру станции
