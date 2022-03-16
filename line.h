@@ -18,7 +18,9 @@ private:
 
     Node* FindNode(uint num) const;   //поиск узла в skip-list по номеру станции
 
-    void ChangeTravel(Node* first_node, Node* second_node, Node* new_node);    //изменение указателей в перегонах при добавлении новой станции между двумя другими
+    void FindLinks(std::vector<Node*>&, const Node* node) const;    //поиск элементов, которые имеют ссылку на данный
+    
+    void ChangeTravel(Node* first_node, Node* second_node, uint time);    //изменение перегонов для двух станций
 
     void RenumStations(uint st_num);       //перенумеровка станций при добавлении в конец или середину
 
@@ -39,7 +41,7 @@ public:
     uint MinTime(uint st_num1, uint st_num2) const;               //оценка минимального времени для перемещения между двумя станциями
 
     void PrintLine() const;     //вывод всех станций линии
-
+    
     const Station& GetSt(uint st_num) const;       //для тестирования
 
     ~Line();

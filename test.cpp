@@ -71,11 +71,11 @@ void TestLine(){
     assert(line.GetSt(2) == st2);  //добавление станции к начальной
    
 
+
     Station st3(3, 10, "Chehovskaya");
     line.AddStation(&st3, 4);
     assert(line.FindLeftNeighbor(3).first == st2 && line.FindLeftNeighbor(3).second == 4);    //добавление станции в корректное место и работа Line::FindLeftNeighbor
     assert(line.FindRightNeighbor(2).first == st3 && line.FindRightNeighbor(2).second == 4);  //работа Line::FindRightNeighbor
-
     assert(line.MinTime(1, 3) == 6);                      //проверка работы метода Line::MinTime;
     assert(line.MinTime(1, 3) == line.MinTime(3, 1));     //в обе стороны должно быть одинаковое время
 
@@ -100,6 +100,7 @@ void TestLine(){
     line.AddStation(&st4,1, 2);
     st2.SetStNum(3);
     st3.SetStNum(4);
+
     assert(line.FindLeftNeighbor(2).first == st1 && line.FindRightNeighbor(2).first == st2);    //корректное добавление в произвольное место
     assert(line.MinTime(3, 1) == 3);
 
@@ -168,9 +169,16 @@ void TestLine(){
     line.AddStation(&st8, 1, 3);
     assert(line.FindRightNeighbor(6).first.GetName() == "Tulskaya" && line.FindLeftNeighbor(6).first.GetName() == "Chehovskaya");
 
-    Station st9(1, 6, "Timiryazevskaya");
+//Тут надо добавить схему
+
+    Station st9(1, 6, "Timiryazevskaya");       //добавление станции в начало для кольцевой линии
     line.AddStation(&st9,2 ,2);
-    line.PrintLine();
+    assert(line.FindRightNeighbor(1).first.GetName() == "Chertanovskaya" && line.FindLeftNeighbor(1).first.GetName() == "Uzhnaya");
+    assert(line.MinTime(1,9) == 2 && line.MinTime(1,4) == 6);  
+
+    Station st10(10, 8, "Tsetnoi bulvar");      //небольшая проверка, что ничего не сломалось после добавления в начало
+    line.AddStation(&st10, 1, 2);
+    assert(line.FindRightNeighbor(10).first.GetName() == "Timiryazevskaya" && line.FindLeftNeighbor(10).first.GetName() == "Uzhnaya");  
     
 }
 
