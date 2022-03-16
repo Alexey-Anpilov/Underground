@@ -7,6 +7,7 @@
 
 class Line {
 private:
+    static uint st_count;
     const uint max_level = 3;     //максимум 3 уровня связей
     const float p = 0.5;          //вероятность при наличии i-того уровня получить (i+1) уровень  
     
@@ -21,9 +22,11 @@ private:
 
     void RenumStations(uint st_num);       //перенумеровка станций при добавлении в конец или середину
 
-    //void SetFirstStation(const Station*);    //функция обрабатывает случай, когда заменяется первая станция
+    void AddNode(Node* new_node);             //используется, чтобы добавить узел(в основном для функции AddStation)
+
+    void SetFirstStation(Node* new_node);
 public:
-    Line(const Station* first_st);
+    Line(const Station& first_st);
 
     void AddStation(const Station* new_st, uint time_back, uint time_for = 0);  //добавление станции
 
@@ -41,6 +44,7 @@ public:
 
     ~Line();
 };
+
 
 
 #endif
