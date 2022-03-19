@@ -5,11 +5,7 @@
 #include<vector>
 
 class ChangeStation:public Station{
-private:
-    uint station_num;    // номер станции
-    uint stream;         // пассажиропоток
-    std::string name;   // имя станции 
-    
+private:    
     std::vector<Change> changes;    //набор пересадок на другие линии
 public:
     ChangeStation(int st_num, int stream, std::string name)

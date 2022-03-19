@@ -1,25 +1,21 @@
-FLAGS = -Wall -Wextra
+INCLUDEDIR=headers 
+CC=g++
+CPPFLAGS=-std=c++17 -g -Wall -Wextra
+LDFLAGS=
+SOURCES=src/change_station.cpp src/line.cpp src/node.cpp src/station.cpp test/test.cpp
+OBJDIR=build
+OBJECTS=$(SOURCES:%.cpp=$(OBJDIR)/%.o)
+EXECUTABLE=underground
 
-all: test
+all: $(SOURCES) $(EXECUTABLE) 
 
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-test: test.o line.o station.o change_station.o node.o
-	g++ station.o test.o line.o change_station.o node.o -o test
-
-station.o: station.cpp station.h
-	g++ -c $(FLAGS) station.cpp
-
-change_station.o: change_station.h station.h change_station.cpp station.cpp
-	g++ -c $(FLAGS) change_station.cpp
-
-test.o: test.cpp
-	g++ -c $(FLAGS) test.cpp
-
-line.o: line.cpp line.h travel.h station.h node.h
-	g++ -c $(FLAGS) line.cpp
-
-node.o: node.h
-	g++ -c $(FLAGS) node.cpp
+$(OBJDIR)/%.o: %.cpp
+	mkdir -p $(@D)
+	$(CC) -c $(CPPFLAGS) -I$(INCLUDEDIR) $< -o $@
 
 clean:
-	rm -rf *.o test line
+	rm -f underground
+	rm -rf build
