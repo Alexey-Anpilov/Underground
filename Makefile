@@ -2,7 +2,7 @@ INCLUDEDIR=headers
 CC=g++
 CPPFLAGS=-std=c++17 -g -Wall -Wextra
 LDFLAGS=
-SOURCES=src/change_station.cpp src/line.cpp src/node.cpp src/station.cpp test/test.cpp
+SOURCES=src/change_station.cpp src/line.cpp src/station.cpp test/test.cpp
 OBJDIR=build
 OBJECTS=$(SOURCES:%.cpp=$(OBJDIR)/%.o)
 EXECUTABLE=underground

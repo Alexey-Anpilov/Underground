@@ -1,52 +1,34 @@
 #ifndef LINE_H_
 #define LINE_H_
 #include<iostream>
-#include<array>
-#include"node.h"
+#include"skip_list.h"
+#include"station.h"
 
-
-class Line {
+class Line{
 private:
-    static uint st_count;
-    const uint max_level = 3;     //максимум 3 уровня связей
-    const float p = 0.5;          //вероятность при наличии i-того уровня получить (i+1) уровень  
+    bool is_circle = false;
+
+    skip_list<uint, Station*> line;
+
+    void changeTravel(Station* first_st, Station* second_st, uint time);
     
-    Node* header = nullptr;     //указатель на начальный элемент
-    
-
-    uint LevelRand() const;     //вычисление количества уровней для нового элемента
-
-    Node* FindNode(uint num) const;   //поиск узла в skip-list по номеру станции
-
-    void FindLinks(std::vector<Node*>&, const Node* node) const;    //поиск элементов, которые имеют ссылку на данный
-    
-    void ChangeTravel(Node* first_node, Node* second_node, uint time);    //изменение перегонов для двух станций
-
-    void RenumStations(uint st_num);       //перенумеровка станций при добавлении в начало или середину
-
-    void AddNode(Node* new_node);             //используется, чтобы добавить узел(в основном для функции AddStation)
-
-    void SetFirstStation(Node* new_node);
+    void renumStations(uint st_num);
 public:
-    Line(const Station& first_st);
+    void addStation(uint st_num, uint stream, std::string name, uint time = 0, uint add_time = 0);
 
-    void AddStation(const Station* new_st, uint time_back, uint time_for = 0);  //добавление станции
+    const Station& find(uint st_num);   //поиск станции по номеру
 
-    void MakeCircle(uint time);                             //можно сделать линию кольцевой
+    Station findLeftNeighbor(uint st_num);
 
-    std::pair<Station, uint> FindRightNeighbor(uint num) const;   //поиск правой соседней станции и времени перегона до нее
+    Station findRightNeighbor(uint st_num);
 
-    std::pair<Station, uint> FindLeftNeighbor(uint num) const;    //поиск левой соседней станции и времени перегона до нее
+    uint minTime(uint st_num1, uint st_num2);
 
-    uint MinTime(uint st_num1, uint st_num2) const;               //оценка минимального времени для перемещения между двумя станциями
-
-    void PrintLine() const;     //Вывод устройства skip-list
-    
-    const Station& GetSt(uint st_num) const;       //для тестирования
-
-    ~Line();
+    void makeCircle(uint time);
 };
 
+skip_list<uint, Station*>::Iterator operator+(skip_list<uint, Station*>::Iterator it, int n);
 
+skip_list<uint, Station*>::Iterator operator-(skip_list<uint, Station*>::Iterator it, int n);
 
 #endif

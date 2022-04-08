@@ -1,5 +1,5 @@
 #include"change_station.h"
 
- void ChangeStation::AddChange(const Change& ch){
+ void ChangeStation::addChange(const Change& ch){
         changes.push_back(ch);
     }

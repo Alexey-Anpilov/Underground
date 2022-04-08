@@ -3,21 +3,22 @@
 #include"station.h"
 #include"line.h"
 #include"change_station.h"
+#include"skip_list.h"
 
 void TestStation(){
     // создание станции
     {
         Station st(1, 12, "Novodachnaya");   
-        assert(st.GetNum() == 1);
-        assert(st.GetStream() == 12);
-        assert(st.GetName() == "Novodachnaya");
+        assert(st.getNum() == 1);
+        assert(st.getStream() == 12);
+        assert(st.getName() == "Novodachnaya");
     }
 
     // изменение пассажиропотока
     {
         Station st(1, 12, "Novodachnaya");
-        st.ChangePassStream(20);
-        assert(st.GetStream() == 20);
+        st.changePassStream(20);
+        assert(st.getStream() == 20);
     }
 
     // сравнение станций операторами < и ==
@@ -35,21 +36,48 @@ void TestStation(){
 
 void TestChange(){              //тесты для пересадки(надо дополнить)
     Change ch(10, 20);
-    assert(ch.GetTime() == 10 && ch.GetStream() == 20);
+    assert(ch.getTime() == 10 && ch.getStream() == 20);
 }
 
 void TestChangeStation(){      //тесты для пересадочной станции
     Change ch(1, 2);
     ChangeStation st(2, 10, "Arbatskaya");
-    st.AddChange(ch);          //добавление пересадки
-    assert(!st.GetChanges().empty());
-
+    st.addChange(ch);          //добавление пересадки
+    assert(!st.getChanges().empty());
+/*
     Station st1(1, 6, "Ohotnii ryad");
     Line line(st1);
     line.AddStation(&st, 2);                            //добавление станции пересадки на линию
     assert(line.FindLeftNeighbor(2).first == st1 && line.FindRightNeighbor(1).first == st);
-    assert(!line.GetSt(2).GetChanges().empty());
+    std::cout << (line.GetSt(2).GetChanges().empty());
+    //assert(!line.GetSt(2).GetChanges().empty());*/
 }
+
+
+void TestSkipList(){
+    skip_list<int, int> nums;
+    nums.add(1, 2);
+    nums.add(2, 4);
+    nums.add(4, 6);
+    nums.add(3, 10);
+    auto it = nums.begin();
+    assert(*it == 2);   //проверка метода begin
+    it = nums.end();    
+    assert(*it == 6);   //проверка метода end
+    assert(nums.size() == 4);   //проверка метода size
+    
+    auto b = nums.begin();
+    assert(b != it);    //проверка перегрузки !=
+    assert(*(++b) == 4 && *(--b) == 2); //проверка перегрузки ++ и --(префикс)
+    assert(*(b++) == 2 && *(b--) == 4 && *b == 2);  //проверка ++ и -- (постфикс)
+    b += 3;
+    assert(*it == *b);  //проверка перегрузки +=
+    b -= 3;
+    assert(*b == *nums.begin()); //проверка перегрузки -=
+    b = it;
+    assert(*b == *it);  //проверка перегрузки =
+}
+
 
 void TestLine(){
 /*  Сначала идут тесты на прямое добавление и некольцевой линии
@@ -61,24 +89,21 @@ void TestLine(){
              | 4       
           Chehovskaya 
 */
-
     Station st1(1, 12, "Borovitskaya");
-    Line line(st1);
-    assert(line.GetSt(1) == st1);  //добавление первой станции конструктором
+    Line line;
+    line.addStation(1,12, "Borovitskaya");
+    assert(line.find(1).getName() == "Borovitskaya");  //добавление первой станции 
 
     Station st2(2, 15, "Polyanka");
-    line.AddStation(&st2, 2);    
-    assert(line.GetSt(2) == st2);  //добавление станции к начальной
-   
-
-
+    line.addStation(2, 15, "Polyanka", 2);    
+    assert(line.find(2) == st2);
+    
     Station st3(3, 10, "Chehovskaya");
-    line.AddStation(&st3, 4);
-    assert(line.FindLeftNeighbor(3).first == st2 && line.FindLeftNeighbor(3).second == 4);    //добавление станции в корректное место и работа Line::FindLeftNeighbor
-    assert(line.FindRightNeighbor(2).first == st3 && line.FindRightNeighbor(2).second == 4);  //работа Line::FindRightNeighbor
-    assert(line.MinTime(1, 3) == 6);                      //проверка работы метода Line::MinTime;
-    assert(line.MinTime(1, 3) == line.MinTime(3, 1));     //в обе стороны должно быть одинаковое время
-
+    line.addStation(3, 10, "Chehovskaya", 4);
+    assert(line.findLeftNeighbor(3) == st2);    //добавление станции в корректное место и работа Line::FindLeftNeighbor
+    assert(line.findRightNeighbor(2) == st3);  //работа Line::FindRightNeighbor
+    assert(line.minTime(1, 3) == 6);                      //проверка работы метода Line::MinTime;
+    assert(line.minTime(1, 3) == line.minTime(3, 1));     //в обе стороны должно быть одинаковое время
 
 /*  Далее станции добавляются в произвольное место или в начало
     Схема такая:
@@ -96,22 +121,20 @@ void TestLine(){
 */
 
 
-    Station st4(2, 20, "Prazhskaya");
-    line.AddStation(&st4,1, 2);
-    st2.SetStNum(3);
-    st3.SetStNum(4);
 
-    assert(line.FindLeftNeighbor(2).first == st1 && line.FindRightNeighbor(2).first == st2);    //корректное добавление в произвольное место
-    assert(line.MinTime(3, 1) == 3);
+    Station st4(2, 20, "Prazhskaya");
+    line.addStation(2, 20, "Prazhskaya", 1, 2);
+    assert(line.findLeftNeighbor(2).getName() == "Borovitskaya" && line.findRightNeighbor(2).getName() == "Polyanka");    //корректное добавление в произвольное место
+    assert(line.minTime(3, 1) == 3);
 
     Station st5(1, 5, "Chertanovskaya");                                //добавляем в начало
-    line.AddStation(&st5, 0, 3);
-    assert(line.FindRightNeighbor(1).first.GetName() == st1.GetName());
-    assert(line.MinTime(3, 1) == 4 && line.MinTime(3, 5) == 6);
+    line.addStation(1, 5, "Chertanovskaya", 0, 3);
+    assert(line.findRightNeighbor(1).getName() == st1.getName());
+    assert(line.minTime(3, 1) == 4 && line.minTime(3, 5) == 6);
 
     Station st6(6, 7, "Tulskaya");                                      //проверяем, что ничего не сломалось после добавления в начало
-    line.AddStation(&st6, 2);
-    assert(line.FindLeftNeighbor(6).first.GetName() == "Chehovskaya" && line.MinTime(1, 6) == 12);
+    line.addStation(6, 7, "Tulskaya", 2);
+    assert(line.findLeftNeighbor(6).getName() == "Chehovskaya" && line.minTime(1, 6) == 12);
 
 
 /*  Далее станции идет проверка cсоздания кольцевой линии
@@ -129,12 +152,12 @@ void TestLine(){
      -----Tulskaya
 */
 
-    line.MakeCircle(1);
-    assert(line.FindLeftNeighbor(1).first.GetName() == "Tulskaya");    //проверка создания круговой линии
-    assert(line.FindRightNeighbor(6).first.GetName() == "Chertanovskaya");
-    assert(line.MinTime(4, 1) == 6 && line.MinTime(1, 4) == line.MinTime(1,4));    //корректность работы минимального времени на кольцевой линии
-    assert(line.MinTime(1, 6) == 1);
-    assert(line.MinTime(5, 1) == 3);
+    line.makeCircle(1);
+    assert(line.findLeftNeighbor(1).getName() == "Tulskaya");    //проверка создания круговой линии
+    assert(line.findRightNeighbor(6).getName() == "Chertanovskaya");
+    assert(line.minTime(4, 1) == 6 && line.minTime(1, 4) == line.minTime(1,4));    //корректность работы минимального времени на кольцевой линии
+    assert(line.minTime(1, 6) == 1);
+    assert(line.minTime(5, 1) == 3);
 
 
 
@@ -159,32 +182,31 @@ void TestLine(){
 */
 
     Station st7(7, 20, "Uzhnaya"); //добавление станции в конец
-    line.AddStation(&st7, 1, 3);
-    assert(line.FindLeftNeighbor(1).first == st7);
-    assert(line.MinTime(6, 1) == 4);
-    assert(line.MinTime(1, 7) == 3);
+    line.addStation(7, 20, "Uzhnaya", 1, 3);
+    assert(line.findLeftNeighbor(1).getName() == "Uzhnaya");
+    assert(line.minTime(6, 1) == 4);
+    assert(line.minTime(1, 7) == 3);
 
 
     Station st8(6, 10, "Serpuhovskaya");         //добавление станции в произвольное место
-    line.AddStation(&st8, 1, 3);
-    assert(line.FindRightNeighbor(6).first.GetName() == "Tulskaya" && line.FindLeftNeighbor(6).first.GetName() == "Chehovskaya");
+    line.addStation(6, 10, "Serpuhovskaya", 1, 3);
+    assert(line.findRightNeighbor(6).getName() == "Tulskaya" && line.findLeftNeighbor(6).getName() == "Chehovskaya");
 
 //Тут надо добавить схему
 
     Station st9(1, 6, "Timiryazevskaya");       //добавление станции в начало для кольцевой линии
-    line.AddStation(&st9,2 ,2);
-    assert(line.FindRightNeighbor(1).first.GetName() == "Chertanovskaya" && line.FindLeftNeighbor(1).first.GetName() == "Uzhnaya");
-    assert(line.MinTime(1,9) == 2 && line.MinTime(1,4) == 6);  
+    line.addStation(1, 6, "Timiryazevskaya",2 ,2);
+    assert(line.findRightNeighbor(1).getName() == "Chertanovskaya" && line.findLeftNeighbor(1).getName() == "Uzhnaya");
+    assert(line.minTime(1,9) == 2 && line.minTime(1,4) == 6);  
 
     Station st10(10, 8, "Tsetnoi bulvar");      //небольшая проверка, что ничего не сломалось после добавления в начало
-    line.AddStation(&st10, 1, 2);
-    assert(line.FindRightNeighbor(10).first.GetName() == "Timiryazevskaya" && line.FindLeftNeighbor(10).first.GetName() == "Uzhnaya");  
-    
+    line.addStation(10, 8, "Tsetnoi bulvar", 1, 2);
+    assert(line.findRightNeighbor(10).getName() == "Timiryazevskaya" && line.findLeftNeighbor(10).getName() == "Uzhnaya");  
+
 }
 
-uint Line::st_count = 0;
-
 int main() {
+    TestSkipList();
     TestStation();
     TestLine();
 }

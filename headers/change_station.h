@@ -11,9 +11,9 @@ public:
     ChangeStation(int st_num, int stream, std::string name)
         :Station(st_num, stream, name) {} 
     
-    void AddChange(const Change& ch);   //добавление пересадки
+    void addChange(const Change& ch);   //добавление пересадки
     
-    virtual std::vector<Change> GetChanges() const override{     //получение набора пересадок
+    virtual std::vector<Change> getChanges() const override{     //получение набора пересадок
         return changes;
     }
 };

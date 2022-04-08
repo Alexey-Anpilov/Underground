@@ -1,32 +1,37 @@
 #ifndef TRAVEL_H_
 #define TRAVEL_H_
 
-#include"station.h"
+class Station;
 
 class Travel{
 private:
     uint time;                      //время прогона(мин)
-    Station* first_st = nullptr;    //указатель на первую станцию
-    Station* second_st = nullptr;   //указатель на вторую станцию
-    
-    
-    friend class Node;
-    friend class Line;
+    Station* first_st;              //указатель на первую станцию
+    Station* second_st;             //указатель на вторую станцию
+    friend class Station;
 public:
-    Travel(uint time):time(time) {}
-    
-    //получение значений полей класса
-
-    const Station& GetFirstStation(){
-        return *first_st;
+    Travel(){
+        time = 0;
+        first_st = nullptr;
+        second_st = nullptr;
     }
 
+    Travel(Station* first_st, Station* second_st, uint time)
+        :time(time),
+         first_st(first_st),
+         second_st(second_st) {}
 
-    const Station& GetSecondStation(){
+
+    const Station& travel() const{
         return *second_st;
     }
 
-    uint GetTime()const {
+
+    const Station& stay() const{
+        return *first_st;
+    }
+
+    uint timeToTravel() const{
         return time;
     }
 };

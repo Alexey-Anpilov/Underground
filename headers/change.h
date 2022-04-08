@@ -1,35 +1,28 @@
 #ifndef CHANGE_H_
 #define CHANGE_H_
 
-class Node;
+class Station;
 
 class Change{
 private:
-    Node* first_st = nullptr;   //указатель на одной узел, содержащий информацию о станции на ветке
-    Node* second_st = nullptr;  //указатель на другой узел, содержащий информацию о станции на ветке
     uint time;                  //время(мин) на пересадку
     uint stream;                //средний пассажиропоток на пересадке
+    Station* first_st;   //указатель на одной узел, содержащий информацию о станции на ветке
+    Station* second_st;  //указатель на другой узел, содержащий информацию о станции на ветке
 public: 
-    Change(uint time, uint stream)
+    Change(uint time, uint stream, Station* first_st = nullptr, Station* second_st = nullptr)
         :time(time),
-         stream(stream) {}
+         stream(stream),
+         first_st(first_st),
+         second_st(second_st) {}
 
 
     //получение значений полей
-    
-    const Node& GetFirstNode(){
-        return *first_st;
-    }
-
-    const Node& GetSecondNode(){
-        return *second_st;
-    }
-
-    uint GetTime() const{
+    uint getTime() const{
         return time;
     }
 
-    uint GetStream() const{
+    uint getStream() const{
         return stream;
     }
 };
