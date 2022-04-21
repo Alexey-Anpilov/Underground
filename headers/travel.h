@@ -22,17 +22,26 @@ public:
          second_st(second_st) {}
 
 
-    const Station& travel() const{
-        return *second_st;
+    Station* travel() const{
+        return second_st;
     }
 
 
-    const Station& stay() const{
-        return *first_st;
+    Station* stay() const{
+        return first_st;
     }
 
     uint timeToTravel() const{
         return time;
+    }
+
+    Travel& operator=(const Travel& tr){
+        if(&tr != this){
+            this->time = tr.time;
+            this->first_st = tr.first_st;
+            this->second_st = tr.second_st;
+        }
+        return *this;
     }
 };
 

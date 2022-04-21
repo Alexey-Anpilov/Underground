@@ -17,9 +17,9 @@ void Line::renumStations(uint st_num){
     (*it)->setStNum(it.getNode()->key);
 }
 
-
-void Line::addStation(uint st_num, uint stream, std::string name, uint time, uint add_time){
-    Station* st = new Station(st_num, stream, name);
+void Line::addSt(Station* st, uint time, uint add_time){
+    uint st_num = st->getNum();
+    stations[st->getName()] = st_num;
     if (st_num < line.size()){
         renumStations(st_num);
     }
@@ -45,20 +45,61 @@ void Line::addStation(uint st_num, uint stream, std::string name, uint time, uin
     }
 }
 
-const Station& Line::find(uint st_num){
+
+Line::Line(const Line& l){
+    stations = l.stations;
+    line = l.line;
+    is_circle = l.is_circle;
+}
+
+Line::Line(){}
+
+/*void Line::clear(){
+    auto it = line.begin();
+    for(; it != line.end(); ++it){
+        delete it.getNode()->data;
+    }
+    delete it.getNode()->data;
+}*/
+
+
+
+void Line::addStation(uint st_num, uint stream, std::string name, uint time, uint add_time){
+    Station* st = new Station(st_num, stream, name);
+    addSt(st, time, add_time);
+}
+
+void Line::addChangeStation(uint st_num, uint stream, std::string name, uint time, uint add_time){
+    Station* st = new ChangeStation(st_num, stream, name);
+    addSt(st, time, add_time);
+}
+
+const Station& Line::find_t(uint st_num){
     auto it = line.find(st_num);
     return *(*it);
 }     
 
+
+skip_list<uint, Station*>::Iterator Line::find(uint st_num){
+    return line.find(st_num);
+}
+
+
 Station Line::findLeftNeighbor(uint st_num){
     auto it = line.find(st_num);
-    return (*it)->travelBack();
+    return *(*it)->travelBack();
 }
 
 Station Line::findRightNeighbor(uint st_num){
     auto it = line.find(st_num);
-    return (*it)->travelForward();
+    return *(*it)->travelForward();
 }
+
+ void Line::addChange(std::string name, Change ch){
+     uint st_num = stations[name];
+     auto it = line.find(st_num);
+     (*it)->addChange(ch);
+ }
 
 
 uint Line::minTime(uint st_num1, uint st_num2){       //ищет минимальное время пути между двумя станциия
@@ -101,6 +142,24 @@ void Line::makeCircle(uint time){
     is_circle = true;
 }
 
+uint Line::onLine(std::string name) const {
+    if(stations.count(name) == 0){
+        return 0;
+    } else{
+        return stations.at(name);
+    }
+}
+
+Line& Line::operator=(const Line& l){
+    if(&l != this){
+        stations = l.stations;
+        line = l.line;
+        is_circle = l.is_circle;
+    }
+    return *this;
+}
+
+
 skip_list<uint, Station*>::Iterator operator+(skip_list<uint, Station*>::Iterator it, int n){
     it += n;
     return it;
@@ -111,3 +170,5 @@ skip_list<uint, Station*>::Iterator operator-(skip_list<uint, Station*>::Iterato
     return it;
 }
 
+Line::~Line(){
+}

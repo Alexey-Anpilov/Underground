@@ -19,10 +19,8 @@ public:
         :station_num(st_num),
          stream(stream),
          name(name) {}  
-
-
-    void changePassStream(int new_stream);   // изменение пассажиропотока
     
+    Station(const Station& st);
 
     uint getNum() const{            //получение номера станции
         return station_num;
@@ -40,21 +38,33 @@ public:
         station_num = new_stnum;
     }
 
+    void changePassStream(int new_stream);   // изменение пассажиропотока
+
     void setTravelFor(uint time, Station* st);
 
     void setTravelBack(uint time, Station* st);
 
+    uint travelBackTime() const;
+    
     uint travelForwardTime() const;
 
-    Station travelForward() const{
-        return *forward.second_st;
+    Station* travelForward() const{
+        return forward.second_st;
     }
 
-    Station travelBack() const{
-        return *back.second_st;
+    Station* travelBack() const{
+        return back.second_st;
     }
+
+    Station& operator=(const Station& st);
     
-    uint travelBackTime() const;
+    virtual bool isChangeStation() const{
+        return false;
+    }
+
+    virtual void addChange(const Change& ch){
+        return;
+    }
 
     virtual std::vector<Change> getChanges() const{     //будет проверяться, что возвращаемый вектор пустой => по указателю лежит Station 
         return {};

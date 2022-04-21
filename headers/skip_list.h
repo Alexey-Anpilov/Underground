@@ -5,9 +5,9 @@
 template<typename KEY, typename DATA>
 class skip_list{
 private:
-    static uint s;
-    const uint max_level = 3;       
-    const float p = 0.5;
+    uint s = 0;
+    uint max_level = 3;       
+    float p = 0.5;
 
     struct node{
         KEY key;
@@ -21,7 +21,15 @@ private:
              following(lvl, nullptr),  
              previous(previous),
              next(next) {}
+        node(const node& nd){
+            key = nd.key;
+            data = nd.data;
+            following.resize(nd.following.size(), nullptr);
+            previous = nullptr;
+            next = nullptr;
+        }
     };
+
 
     node* header = nullptr;
 
@@ -51,14 +59,18 @@ public:
         Iterator& operator=(const Iterator& it);
         bool operator!=(const Iterator& it);
         bool operator==(const Iterator& it);
-        bool empty();
+        bool empty() const;
         node* getNode();
     };
+
+    skip_list(const skip_list& sk_ls);
+
+    skip_list();
 
     Iterator begin();
     Iterator end();
 
-    static uint size(){
+    uint size() const{
         return s;
     }
 
@@ -66,11 +78,11 @@ public:
 
     Iterator find(const KEY& key);
 
+    skip_list<KEY, DATA>& operator=(const skip_list<KEY, DATA>& sk_ls);
+
     ~skip_list();
 };
 
-template<typename KEY, typename DATA>
-uint skip_list<KEY, DATA>::s = 0;
 
 //------Private методы------
 template<typename KEY, typename DATA>
@@ -231,7 +243,7 @@ bool skip_list<KEY, DATA>::Iterator::operator==(const skip_list::Iterator& it){
 }
 
 template<typename KEY, typename DATA>
-bool skip_list<KEY, DATA>::Iterator::empty(){
+bool skip_list<KEY, DATA>::Iterator::empty() const{
     if (this->current_node == nullptr){
         return true;
     }else return false;
@@ -240,6 +252,49 @@ bool skip_list<KEY, DATA>::Iterator::empty(){
 template<typename KEY, typename DATA>
 typename skip_list<KEY, DATA>::node* skip_list<KEY, DATA>::Iterator::getNode(){
     return current_node;
+}
+
+template<typename KEY, typename DATA>
+skip_list<KEY, DATA>::skip_list(){}
+
+
+template<typename KEY, typename DATA>
+skip_list<KEY, DATA>::skip_list(const skip_list<KEY, DATA>& sk_ls){
+    max_level = sk_ls.max_level;
+    p = sk_ls.p;
+    s = sk_ls.s;
+    header = new node(*sk_ls.header);
+    node* cur = sk_ls.header;
+    cur = cur->next;
+    node* current = header;
+    node* nxt; 
+    while(cur != nullptr && cur != sk_ls.header){
+        nxt = new node(*cur);
+        current->next = nxt;
+        current->following[0] = nxt;
+        nxt->previous = current;
+        current = current->next;
+        cur = cur->next;
+    }
+    if(cur == header){
+        header->previous = current;
+        current->next = header;
+    }
+    current = header;
+    for(int i = max_level - 1; i >= 1; --i){
+        node* pt = sk_ls.header->following[i];
+        current = header;
+        while(pt != nullptr){
+            KEY k = pt->key;
+            node* t = header;
+            while(t->key != k){
+                t = t->next;
+            }
+            current->following[i] = t;
+            current = t;
+            pt = pt->following[i];
+        }
+    }
 }
 
 template<typename KEY,typename DATA>
@@ -298,8 +353,52 @@ typename skip_list<KEY, DATA>::Iterator skip_list<KEY, DATA>::add(const KEY& key
 
 template<typename KEY, typename DATA>
 typename skip_list<KEY,DATA>::Iterator skip_list<KEY, DATA>::find(const KEY& key){
-    node* p = findNode(key);
-    return Iterator(*this, p);
+    node* it = findNode(key);
+    return Iterator(*this, it);
+}
+
+template<typename KEY, typename DATA>
+skip_list<KEY, DATA>& skip_list<KEY,DATA>::operator=(const skip_list<KEY, DATA>& sk_ls){
+    if(&sk_ls != this){
+        max_level = sk_ls.max_level;
+        p = sk_ls.p;
+        s = sk_ls.s;
+        delete header;
+        header = new node(*sk_ls.header);
+        node* cur = sk_ls.header;
+        cur = cur->next;
+        node* current = header;
+        node* nxt; 
+        while(cur != nullptr && cur != sk_ls.header){
+            nxt = new node(*cur);
+            delete current->next;
+            current->next = nxt;
+            current->following[0] = nxt;
+            nxt->previous = current;
+            current = current->next;
+            cur = cur->next;
+        }
+        if(cur == header){
+        header->previous = current;
+        current->next = header;
+        }
+        current = header;
+        for(int i = max_level - 1; i >= 1; --i){
+            node* pt = sk_ls.header->following[i];
+            current = header;
+            while(pt != nullptr){
+                KEY k = pt->key;
+                node* t = header;
+                while(t->key != k){
+                    t = t->next;
+                }
+                current->following[i] = t;
+                current = t;
+                pt = pt->following[i];
+            }
+        }
+    }
+    return *this;
 }
 
 

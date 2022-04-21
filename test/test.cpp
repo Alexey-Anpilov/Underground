@@ -4,6 +4,8 @@
 #include"line.h"
 #include"change_station.h"
 #include"skip_list.h"
+#include"underground.h"
+
 
 void TestStation(){
     // создание станции
@@ -34,24 +36,23 @@ void TestStation(){
     }
 }
 
-void TestChange(){              //тесты для пересадки(надо дополнить)
+/*void TestChange(){              //тесты для пересадки(надо дополнить)
     Change ch(10, 20);
     assert(ch.getTime() == 10 && ch.getStream() == 20);
-}
-
-void TestChangeStation(){      //тесты для пересадочной станции
+}*/
+/*void TestChangeStation(){      //тесты для пересадочной станции
     Change ch(1, 2);
     ChangeStation st(2, 10, "Arbatskaya");
     st.addChange(ch);          //добавление пересадки
     assert(!st.getChanges().empty());
-/*
+
     Station st1(1, 6, "Ohotnii ryad");
-    Line line(st1);
-    line.AddStation(&st, 2);                            //добавление станции пересадки на линию
-    assert(line.FindLeftNeighbor(2).first == st1 && line.FindRightNeighbor(1).first == st);
-    std::cout << (line.GetSt(2).GetChanges().empty());
-    //assert(!line.GetSt(2).GetChanges().empty());*/
-}
+    Line line;
+    line.addStation(1, 6, "Ohotnii ryad");    
+    line.addChangeStation(2, 10, "Arbatskaya");                       
+    line.addChange("Arbatskaya", ch);
+    assert(!line.find_p(2)->getChanges().empty());
+}*/
 
 
 void TestSkipList(){
@@ -92,11 +93,11 @@ void TestLine(){
     Station st1(1, 12, "Borovitskaya");
     Line line;
     line.addStation(1,12, "Borovitskaya");
-    assert(line.find(1).getName() == "Borovitskaya");  //добавление первой станции 
+    assert(line.find_t(1).getName() == "Borovitskaya");  //добавление первой станции 
 
     Station st2(2, 15, "Polyanka");
     line.addStation(2, 15, "Polyanka", 2);    
-    assert(line.find(2) == st2);
+    assert(line.find_t(2) == st2);
     
     Station st3(3, 10, "Chehovskaya");
     line.addStation(3, 10, "Chehovskaya", 4);
@@ -204,11 +205,34 @@ void TestLine(){
     assert(line.findRightNeighbor(10).getName() == "Timiryazevskaya" && line.findLeftNeighbor(10).getName() == "Uzhnaya");  
 
 }
+void TestUnderground(){
+    Line line;
+    line.addStation(1, 12, "Borovitskaya");
+    line.addStation(2, 15, "Polyanka", 2);
+    line.addStation(3, 10, "Chehovskaya", 4);
+    line.addChangeStation(4, 10, "ChangeHere");
+    Line line1;
+    line1.addStation(1, 12, "bbrrr");
+    line1.addChangeStation(2, 2, "chst", 4);
+    Station* st1 = line1.find_p(2);
+    Station* st2 = line.find_p(4);
+    line.addChange("ChangeHere", Change(1,2,st2, st1));
+    line1.addChange("chst", Change(1, 2, st1, st2));
+    Underground underground;
+    underground.addLine(line);
+    underground.addLine(line1);
+    std::pair<uint, std::vector<std::string>> path = underground.timeMinPath("Borovitskaya", "bbrrr");
+    std::cout << path.first << std::endl;
+    for(const auto& st:path.second){
+        std::cout << st << std::endl;
+    }
+}
 
 int main() {
     TestSkipList();
     TestStation();
-    TestLine();
+/*TestLine();*/
+    TestUnderground();
 }
 
 
