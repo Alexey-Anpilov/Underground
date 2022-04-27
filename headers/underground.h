@@ -14,7 +14,9 @@ public:
 
     std::pair<uint, std::vector<std::string>> timeMinPath(std::string first_st_name, std::string second_st_name);
 
-    std::list<std::string> streamMinPath() const;
+    std::pair<uint, std::vector<std::string>> streamMinPath(std::string first_st_name, std::string second_st_name);
+
+    ~Underground();
 };
 
 #endif

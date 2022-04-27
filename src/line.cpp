@@ -54,13 +54,13 @@ Line::Line(const Line& l){
 
 Line::Line(){}
 
-/*void Line::clear(){
+void Line::clear(){
     auto it = line.begin();
     for(; it != line.end(); ++it){
         delete it.getNode()->data;
     }
     delete it.getNode()->data;
-}*/
+}
 
 
 
@@ -74,14 +74,8 @@ void Line::addChangeStation(uint st_num, uint stream, std::string name, uint tim
     addSt(st, time, add_time);
 }
 
-const Station& Line::find_t(uint st_num){
-    auto it = line.find(st_num);
-    return *(*it);
-}     
-
-
-skip_list<uint, Station*>::Iterator Line::find(uint st_num){
-    return line.find(st_num);
+skip_list<uint, Station*>::Iterator Line::find(std::string st_name){
+    return line.find(stations[st_name]);
 }
 
 

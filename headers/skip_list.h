@@ -264,8 +264,7 @@ skip_list<KEY, DATA>::skip_list(const skip_list<KEY, DATA>& sk_ls){
     p = sk_ls.p;
     s = sk_ls.s;
     header = new node(*sk_ls.header);
-    node* cur = sk_ls.header;
-    cur = cur->next;
+    node* cur = sk_ls.header->next;
     node* current = header;
     node* nxt; 
     while(cur != nullptr && cur != sk_ls.header){
@@ -294,6 +293,11 @@ skip_list<KEY, DATA>::skip_list(const skip_list<KEY, DATA>& sk_ls){
             current = t;
             pt = pt->following[i];
         }
+    }
+
+    if(sk_ls.header->previous != nullptr){
+        this->header->previous = this->end().getNode();
+        this->end().getNode()->next = this->header;
     }
 }
 
@@ -396,6 +400,10 @@ skip_list<KEY, DATA>& skip_list<KEY,DATA>::operator=(const skip_list<KEY, DATA>&
                 current = t;
                 pt = pt->following[i];
             }
+        }
+        if(sk_ls.header->previous != nullptr){
+            this->header->previous = this->end().getNode();
+            this->end().getNode()->next = this->header;
         }
     }
     return *this;

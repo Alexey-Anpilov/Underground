@@ -93,11 +93,11 @@ void TestLine(){
     Station st1(1, 12, "Borovitskaya");
     Line line;
     line.addStation(1,12, "Borovitskaya");
-    assert(line.find_t(1).getName() == "Borovitskaya");  //добавление первой станции 
+    assert((*line.find("Borovitskaya"))->getName() == "Borovitskaya");  //добавление первой станции 
 
     Station st2(2, 15, "Polyanka");
     line.addStation(2, 15, "Polyanka", 2);    
-    assert(line.find_t(2) == st2);
+    assert(*(*line.find("Polyanka")) == st2);
     
     Station st3(3, 10, "Chehovskaya");
     line.addStation(3, 10, "Chehovskaya", 4);
@@ -207,37 +207,69 @@ void TestLine(){
 }
 void TestUnderground(){
     Line line;
-    line.addStation(1, 12, "Borovitskaya");
-    line.addStation(2, 15, "Polyanka", 2);
-    line.addStation(3, 10, "Chehovskaya", 4);
-    line.addChangeStation(4, 10, "ChangeHere");
+    line.addChangeStation(1, 2, "Borovitskaya");
+    line.addStation(2, 3, "Polyanka", 2);
+    line.addChangeStation(3, 4, "Chehovskaya", 4);
+    line.addChangeStation(4, 3, "Tsvetnoi bulvar", 3);
+    line.makeCircle(2);
     Line line1;
-    line1.addStation(1, 12, "bbrrr");
-    line1.addChangeStation(2, 2, "chst", 4);
-    Station* st1 = line1.find_p(2);
-    Station* st2 = line.find_p(4);
-    line.addChange("ChangeHere", Change(1,2,st2, st1));
-    line1.addChange("chst", Change(1, 2, st1, st2));
+    line1.addStation(1, 1, "Ohotniy Ryad");
+    line1.addChangeStation(2, 5, "Library", 4);
+    line1.addChangeStation(3, 3, "Sportivnaya", 4);
+    line1.addChangeStation(4, 4, "University", 3);
+    Station* st1 = *line.find("Borovitskaya");
+    Station* st2 = *line1.find("Library");
+    line.addChange("Borovitskaya", Change(1,3,st1, st2));
+    line1.addChange("Library", Change(1, 3, st2, st1));
+    st1 = *line.find("Chehovskaya");
+    st2 = *line1.find("University");
+    line.addChange("Chehovskaya", Change(2, 3, st1, st2));
+    line1.addChange("University", Change(2, 3, st2, st1));
     Underground underground;
     underground.addLine(line);
     underground.addLine(line1);
-    std::pair<uint, std::vector<std::string>> path = underground.timeMinPath("Borovitskaya", "bbrrr");
-    std::cout << path.first << std::endl;
-    for(const auto& st:path.second){
-        std::cout << st << std::endl;
-    }
+
+    Line line2;
+    line2.addStation(1, 4, "Pushkinskaya");
+    line2.addChangeStation(2, 2, "Barricadnaya", 3);
+    line2.addChangeStation(3, 1, "1905 Goda", 2);
+    line2.addStation(4, 2, "Shukinskaya", 4);
+    st1 = *line.find("Tsvetnoi bulvar");
+    st2 = *line2.find("Barricadnaya");
+    line.addChange("Tsvetnoi bulvar", Change(3, 3, st1, st2));
+    line2.addChange("Barricadnaya", Change(3, 3, st2, st1));
+
+    st1 = *line1.find("Sportivnaya");
+    st2 = *line2.find("1905 Goda");
+    line1.addChange("Sportivnaya", Change(1, 3, st1, st2));
+    line2.addChange("1905 Goda", Change(1, 3, st2, st1));
+
+   
+    
+    underground.addLine(line2);
+    assert(underground.timeMinPath("Pushkinskaya", "Ohotniy Ryad").first == 13);
+    assert(underground.timeMinPath("Borovitskaya", "University").first == 7);
+    assert(underground.timeMinPath("Polyanka", "Sportivnaya").first == 7);
+    assert(underground.timeMinPath("Chehovskaya", "University").first == 2);
+
+    std::cout << underground.streamMinPath("Barricadnaya", "Shukinskaya").first;
+
 }
 
 int main() {
     TestSkipList();
     TestStation();
-/*TestLine();*/
+    TestLine();
     TestUnderground();
 }
 
 
 
-
+/* std::pair<uint, std::vector<std::string>> path = underground.timeMinPath("Polyanka", "Sportivnaya");
+    std::cout << path.first << std::endl;
+    for(const auto& st:path.second){
+        std::cout << st << std::endl;
+    }*/
 
 
 

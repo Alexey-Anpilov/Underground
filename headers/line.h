@@ -31,16 +31,9 @@ public:
 
     void addChangeStation(uint st_num, uint stream, std::string name, uint time = 0, uint add_time = 0);
 
-    const Station& find_t(uint st_num);   //поиск станции по номеру
-
-    Station* find_p(uint st_num){
-        auto it = line.find(st_num);
-        return *it;
-    }
-
     void addChange(std::string name, Change ch);
 
-    skip_list<uint, Station*>::Iterator find(uint st_num);
+    skip_list<uint, Station*>::Iterator find(std::string st_name);
 
     Station findLeftNeighbor(uint st_num);
 
@@ -53,6 +46,8 @@ public:
     void makeCircle(uint time);
 
     Line& operator=(const Line& l);
+
+    void clear();
 
     ~Line();
 };
